@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.ssb.rawdata.converter</groupId>
     <artifactId>rawdata-converter-app-csv</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <parent>
         <groupId>io.micronaut</groupId>
         <artifactId>micronaut-parent</artifactId>
         <version>2.1.1</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <properties>
@@ -26,7 +25,8 @@
         <connection>scm:git:git://github.com/statisticsnorway/rawdata-converter-app-csv.git</connection>
         <developerConnection>scm:git:git@github.com:statisticsnorway/rawdata-converter-app-csv.git</developerConnection>
         <url>https://github.com/statisticsnorway/rawdata-converter-app-csv</url>
-    </scm>
+      <tag>rawdata-converter-app-csv-0.0.1</tag>
+  </scm>
 
     <repositories>
         <repository>
