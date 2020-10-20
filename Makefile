@@ -2,8 +2,15 @@
 default: | help
 
 .PHONY: build
-build: ## Build project and install to you local maven repo
+build: build-mvn build-docker ## Build all and create docker image
+
+.PHONY: build-mvn
+build-mvn: ## Build project and install to you local maven repo
 	./mvnw clean install
+
+.PHONY: build-docker
+build-docker: ## Build the docker image
+	docker build -t rawdata-converter-app-csv:dev -f Dockerfile .
 
 .PHONY: release-dryrun
 release-dryrun: ## Simulate a release in order to detect any issues
