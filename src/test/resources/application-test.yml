@@ -1,0 +1,60 @@
+micronaut:
+  application.name: rawdata-converter-app-csv
+  server.port: 28080
+
+services:
+  dapla-oauth:
+    host: http://localhost
+    token-endpoint-path: /auth/realms/ssb/protocol/openid-connect/token
+  dapla-data-access:
+    host: data-access.dapla.svc.cluster.local
+    port: 10138
+  dapla-metadata-distributor:
+    host: metadata-distributor.dapla.svc.cluster.local
+    port: 10168
+    project-id: dev-bip
+    topic: metadata-distributor-dataset-updates
+
+pseudo-secrets:
+  - id: secret1
+    content: C5sn7B4YtwcilAwuVx6NuAsMWLusOSA/ldia40ZugDI=
+    type: AES256
+
+rawdata.sources:
+  fs-blah:
+    encryption:
+      key: blah
+      salt: blahblah
+    rawdata-client:
+      provider: filesystem
+      local-temp-folder: temp
+      avro-file:
+        max.seconds: 3600
+        max.bytes: 10485760
+        sync.interval: 500000
+      filesystem:
+        storage-folder: ../localenv/rawdata/blah
+      listing:
+        min-interval-seconds: 0
+
+rawdata.converter:
+  jobs:
+    base:
+      protoype: true
+      debug:
+        dryrun: true
+      target-storage:
+        type: filesystem
+        root: file://./datastore
+      rawdata-source:
+        name: fs-blah
+        topic: testtopic
+        initial-position: FIRST
+      target-dataset:
+        valuation: INTERNAL
+        type: BOUNDED
+        publish-metadata: true
+      pseudo-rules:
+        - name: fodselsnummer
+          pattern: '**/{folkeregisteridentifikator,foedselsEllerDNummer,relatertVedSivilstand,relatertPerson}'
+          func: fpe-fnr(secret1)

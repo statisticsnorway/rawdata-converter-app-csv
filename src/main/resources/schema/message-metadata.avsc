@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "namespace": "no.ssb.rawdata",
+  "name": "metadata",
+  "fields": [
+    {
+      "name": "ulid",
+      "doc": "A unique lexicographically sortable identifier for the message",
+      "type": "string"
+    },
+    {
+      "name": "dcPosition",
+      "doc": "Data collector message position",
+      "type": "string"
+    },
+    {
+      "name": "dcTimestamp",
+      "doc": "Data collector message timestamp",
+      "type": "long"
+    }
+  ]
+}
