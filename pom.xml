@@ -22,6 +22,12 @@
         <exec.mainClass>no.ssb.rawdata.converter.app.csv.Application</exec.mainClass>
     </properties>
 
+    <scm>
+        <connection>scm:git:git://github.com/statisticsnorway/rawdata-converter-app-csv.git</connection>
+        <developerConnection>scm:git:git@github.com:statisticsnorway/rawdata-converter-app-csv.git</developerConnection>
+        <url>https://github.com/statisticsnorway/rawdata-converter-app-csv</url>
+    </scm>
+
     <repositories>
         <repository>
             <id>jcenter.bintray.com</id>
