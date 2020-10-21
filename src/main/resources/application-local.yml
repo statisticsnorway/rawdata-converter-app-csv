@@ -28,7 +28,7 @@ services:
     topic: metadata-distributor-dataset-updates
 
 pseudo-secrets:
-  - id: secret1
+  secret1:
     content: C5sn7B4YtwcilAwuVx6NuAsMWLusOSA/ldia40ZugDI=
     type: AES256
 

@@ -55,5 +55,4 @@ public class DefaultRawdataConverterFactory implements RawdataConverterFactory {
         return new CsvRawdataConverter(converterConfig, valueInterceptorChain);
     }
 
-
 }
