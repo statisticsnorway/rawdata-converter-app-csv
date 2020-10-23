@@ -3,20 +3,20 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.ssb.rawdata.converter</groupId>
     <artifactId>rawdata-converter-app-csv</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9-SNAPSHOT</version>
 
     <parent>
         <groupId>io.micronaut</groupId>
         <artifactId>micronaut-parent</artifactId>
-        <version>2.1.1</version>
+        <version>2.1.2</version>
         <relativePath />
     </parent>
 
     <properties>
         <jdk.version>15</jdk.version>
         <release.version>15</release.version>
-        <micronaut.version>2.1.1</micronaut.version>
-        <rawdata-converter.version>0.5.4</rawdata-converter.version>
+        <micronaut.version>2.1.2</micronaut.version>
+        <rawdata-converter.version>0.5.5</rawdata-converter.version>
         <lombok.version>1.18.12</lombok.version>
         <exec.mainClass>no.ssb.rawdata.converter.app.csv.Application</exec.mainClass>
     </properties>
@@ -186,6 +186,21 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Micronaut-Version>${micronaut.version}</Micronaut-Version>
+                            <Rawdata-Converter-Version>${rawdata-converter.version}</Rawdata-Converter-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
