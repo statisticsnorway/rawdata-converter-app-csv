@@ -1,5 +1,5 @@
 FROM openjdk:15-alpine
-RUN apk --no-cache add curl
+RUN apk --no-cache add curl libc6-compat
 COPY target/rawdata-converter-app-csv-*.jar rawdata-converter-app-csv.jar
 COPY target/classes/logback*.xml /conf/
 ENV LD_LIBRARY_PATH /lib64
