@@ -1,11 +1,15 @@
 package no.ssb.rawdata.converter.app.csv;
 
 import io.micronaut.runtime.Micronaut;
-import no.ssb.rawdata.converter.app.AbstractRawdataConverterApplication;
+import lombok.extern.slf4j.Slf4j;
+import no.ssb.rawdata.converter.app.RawdataConverterApplication;
+import no.ssb.rawdata.converter.util.MavenArtifactUtil;
 
-public class Application extends AbstractRawdataConverterApplication {
+@Slf4j
+public class Application extends RawdataConverterApplication {
 
     public static void main(String[] args) {
+        log.info("rawdata-converter-app-csv version: {}", MavenArtifactUtil.findArtifactVersion("no.ssb.rawdata.converter", "rawdata-converter-app-csv").orElse("unknown"));
         Micronaut.run(Application.class, args);
     }
 
