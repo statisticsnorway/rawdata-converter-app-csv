@@ -16,8 +16,7 @@ endpoints:
 
 services:
   dapla-oauth:
-    host: https://keycloak.prod-bip-app.ssb.no
-    token-endpoint-path: /auth/realms/ssb/protocol/openid-connect/token
+    token-provider: mock
   dapla-data-access:
     host: data-access.dapla.svc.cluster.local
     port: 10138
