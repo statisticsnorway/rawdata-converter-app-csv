@@ -87,7 +87,6 @@ public class CsvRawdataConverter implements RawdataConverter {
 
     @Override
     public ConversionResult convert(RawdataMessage rawdataMessage) {
-        RawdataMessageAdapter.print(rawdataMessage);
         ConversionResultBuilder resultBuilder = ConversionResult.builder(new GenericRecordBuilder(targetAvroSchema));
         addMetadata(rawdataMessage, resultBuilder);
         convertCsvData(rawdataMessage, csvSchemaAdapter, resultBuilder);
