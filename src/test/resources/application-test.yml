@@ -6,6 +6,7 @@ services:
   dapla-oauth:
     host: http://localhost
     token-endpoint-path: /auth/realms/ssb/protocol/openid-connect/token
+    token-provider: keycloak
   dapla-data-access:
     host: data-access.dapla.svc.cluster.local
     port: 10138
