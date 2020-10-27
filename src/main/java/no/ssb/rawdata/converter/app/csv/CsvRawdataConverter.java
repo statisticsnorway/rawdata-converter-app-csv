@@ -11,7 +11,7 @@ import no.ssb.rawdata.converter.core.convert.RawdataConverter;
 import no.ssb.rawdata.converter.core.convert.ValueInterceptorChain;
 import no.ssb.rawdata.converter.core.exception.RawdataConverterException;
 import no.ssb.rawdata.converter.core.schema.AggregateSchemaBuilder;
-import no.ssb.rawdata.converter.core.schema.DcMetadataSchemaAdapter;
+import no.ssb.rawdata.converter.core.schema.DcManifestSchemaAdapter;
 import no.ssb.rawdata.converter.util.RawdataMessageAdapter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -28,13 +28,13 @@ import static no.ssb.rawdata.converter.util.RawdataMessageAdapter.posAndIdOf;
 public class CsvRawdataConverter implements RawdataConverter {
 
     private static final String RAWDATA_ITEMNAME_ENTRY = "entry";
-    private static final String FIELDNAME_METADATA = "dcMetadata";
+    private static final String FIELDNAME_DC_MANIFEST = "dcManifest";
     private static final String FIELDNAME_CSV_DATA = "data";
 
     private final CsvRawdataConverterConfig converterConfig;
     private final ValueInterceptorChain valueInterceptorChain;
 
-    private DcMetadataSchemaAdapter dcMetadataSchemaAdapter;
+    private DcManifestSchemaAdapter dcManifestSchemaAdapter;
     private CsvSchemaAdapter csvSchemaAdapter;
     private Schema targetAvroSchema;
 
@@ -53,22 +53,24 @@ public class CsvRawdataConverter implements RawdataConverter {
           );
 
         RawdataMessageAdapter msg = new RawdataMessageAdapter(sample);
-        dcMetadataSchemaAdapter = DcMetadataSchemaAdapter.of(sample);
+        dcManifestSchemaAdapter = DcManifestSchemaAdapter.of(sample);
         csvSchemaAdapter = CsvSchemaAdapter.of(sample, RAWDATA_ITEMNAME_ENTRY);
+        log.info("Data column names: {}", csvSchemaAdapter.getHeaders());
+
         String targetNamespace = "dapla.rawdata." + msg.getTopic().orElse("csv");
 
         targetAvroSchema = new AggregateSchemaBuilder(targetNamespace)
-          .schema(FIELDNAME_METADATA, dcMetadataSchemaAdapter.getDcMetadataSchema())
+          .schema(FIELDNAME_DC_MANIFEST, dcManifestSchemaAdapter.getDcManifestSchema())
           .schema(FIELDNAME_CSV_DATA, csvSchemaAdapter.getTargetSchema())
           .build();
     }
 
-    public DcMetadataSchemaAdapter dcMetadataSchemaAdapter() {
-        if (dcMetadataSchemaAdapter == null) {
-            throw new IllegalStateException("dcMetadataSchemaAdapter is null. Make sure RawdataConverter#init() was invoked in advance.");
+    public DcManifestSchemaAdapter dcMetadataSchemaAdapter() {
+        if (dcManifestSchemaAdapter == null) {
+            throw new IllegalStateException("dcManifestSchemaAdapter is null. Make sure RawdataConverter#init() was invoked in advance.");
         }
 
-        return dcMetadataSchemaAdapter;
+        return dcManifestSchemaAdapter;
     }
 
     @Override
@@ -88,13 +90,13 @@ public class CsvRawdataConverter implements RawdataConverter {
     @Override
     public ConversionResult convert(RawdataMessage rawdataMessage) {
         ConversionResultBuilder resultBuilder = ConversionResult.builder(new GenericRecordBuilder(targetAvroSchema));
-        addMetadata(rawdataMessage, resultBuilder);
+        addDcManifest(rawdataMessage, resultBuilder);
         convertCsvData(rawdataMessage, csvSchemaAdapter, resultBuilder);
         return resultBuilder.build();
     }
 
-    void addMetadata(RawdataMessage rawdataMessage, ConversionResultBuilder resultBuilder) {
-        resultBuilder.withRecord(FIELDNAME_METADATA, dcMetadataSchemaAdapter().newRecord(rawdataMessage));
+    void addDcManifest(RawdataMessage rawdataMessage, ConversionResultBuilder resultBuilder) {
+        resultBuilder.withRecord(FIELDNAME_DC_MANIFEST, dcMetadataSchemaAdapter().newRecord(rawdataMessage));
     }
 
     void convertCsvData(RawdataMessage rawdataMessage, CsvSchemaAdapter csvSchema, ConversionResultBuilder resultBuilder) {
