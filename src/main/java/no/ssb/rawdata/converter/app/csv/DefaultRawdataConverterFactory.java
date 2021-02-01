@@ -18,23 +18,23 @@ import javax.inject.Singleton;
 @Slf4j
 public class DefaultRawdataConverterFactory implements RawdataConverterFactory {
     private final FieldPseudonymizerFactory pseudonymizerFactory;
-    private final CsvRawdataConverterConfig defaultCsvRawdataConverterConfig;
+    private final CsvRawdataConverterConfig defaultRawdataConverterConfig;
 
     @Override
-    public RawdataConverter newRawdataConverter(ConverterJobConfig jobConfig, String converterConfigJson) {
-        CsvRawdataConverterConfig converterConfig = defaultCsvRawdataConverterConfig;
-        if (converterConfigJson != null) {
+    public RawdataConverter newRawdataConverter(ConverterJobConfig jobConfig) {
+        CsvRawdataConverterConfig converterConfig = defaultRawdataConverterConfig;
+
+        if (! jobConfig.getAppConfig().isEmpty()) {
             try {
-                Json.toObject(CsvRawdataConverterConfig.class, converterConfigJson);
+                converterConfig = Json.toObject(CsvRawdataConverterConfig.class, jobConfig.appConfigJson());
             }
             catch (Exception e) {
-                throw new RawdataConverterException("Invalid CsvRawdataConverterConfig params: " + converterConfigJson, e);
+                throw new RawdataConverterException("Invalid CsvRawdataConverterConfig params: " + jobConfig.appConfigJson(), e);
             }
         }
 
         return newRawdataConverter(jobConfig, converterConfig);
     }
-
     public RawdataConverter newRawdataConverter(ConverterJobConfig jobConfig, CsvRawdataConverterConfig converterConfig) {
         ValueInterceptorChain valueInterceptorChain = new ValueInterceptorChain();
 
@@ -49,7 +49,7 @@ public class DefaultRawdataConverterFactory implements RawdataConverterFactory {
 */
         // Make sure the CsvConverterConfig is not null
         if (converterConfig == null) {
-            converterConfig = (defaultCsvRawdataConverterConfig == null) ? new CsvRawdataConverterConfig() : defaultCsvRawdataConverterConfig;
+            converterConfig = (defaultRawdataConverterConfig == null) ? new CsvRawdataConverterConfig() : defaultRawdataConverterConfig;
         }
 
         return new CsvRawdataConverter(converterConfig, valueInterceptorChain);
