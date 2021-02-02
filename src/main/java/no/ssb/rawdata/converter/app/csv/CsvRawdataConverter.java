@@ -12,10 +12,10 @@ import no.ssb.rawdata.converter.core.convert.ValueInterceptorChain;
 import no.ssb.rawdata.converter.core.exception.RawdataConverterException;
 import no.ssb.rawdata.converter.core.schema.AggregateSchemaBuilder;
 import no.ssb.rawdata.converter.core.schema.DcManifestSchemaAdapter;
+import no.ssb.rawdata.converter.metrics.MetricName;
 import no.ssb.rawdata.converter.util.RawdataMessageAdapter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericRecordBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -109,9 +109,8 @@ public class CsvRawdataConverter implements RawdataConverter {
 
             List<GenericRecord> dataItems = new ArrayList<>();
             records.forEach(dataItems::add);
-            resultBuilder.appendCounter("totalLinesCount", dataItems.size());
+            resultBuilder.appendCounter(MetricName.RAWDATA_RECORDS_TOTAL, dataItems.size());
             resultBuilder.withRecord(FIELDNAME_CSV_DATA, csvSchema.toTargetRecord(dataItems));
-
         }
         catch (Exception e) {
             resultBuilder.addFailure(e);
