@@ -16,6 +16,7 @@ import no.ssb.rawdata.converter.metrics.MetricName;
 import no.ssb.rawdata.converter.util.RawdataMessageAdapter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.generic.GenericRecordBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ import static no.ssb.rawdata.converter.util.RawdataMessageAdapter.posAndIdOf;
 public class CsvRawdataConverter implements RawdataConverter {
 
     private static final String RAWDATA_ITEMNAME_ENTRY = "entry";
-    private static final String FIELDNAME_DC_MANIFEST = "dcManifest";
+    private static final String FIELDNAME_MANIFEST = "manifest";
+    private static final String FIELDNAME_DC_MANIFEST = "collector";
     private static final String FIELDNAME_CSV_DATA = "data";
 
     private final CsvRawdataConverterConfig converterConfig;
@@ -37,6 +39,7 @@ public class CsvRawdataConverter implements RawdataConverter {
     private DcManifestSchemaAdapter dcManifestSchemaAdapter;
     private CsvSchemaAdapter csvSchemaAdapter;
     private Schema targetAvroSchema;
+    private Schema manifestSchema;
 
     public CsvRawdataConverter(CsvRawdataConverterConfig converterConfig, ValueInterceptorChain valueInterceptorChain) {
         this.converterConfig = converterConfig;
@@ -59,8 +62,12 @@ public class CsvRawdataConverter implements RawdataConverter {
 
         String targetNamespace = "dapla.rawdata." + msg.getTopic().orElse("csv");
 
-        targetAvroSchema = new AggregateSchemaBuilder(targetNamespace)
+        manifestSchema = new AggregateSchemaBuilder("dapla.rawdata.manifest")
           .schema(FIELDNAME_DC_MANIFEST, dcManifestSchemaAdapter.getDcManifestSchema())
+          .build();
+
+        targetAvroSchema = new AggregateSchemaBuilder(targetNamespace)
+          .schema(FIELDNAME_MANIFEST, manifestSchema)
           .schema(FIELDNAME_CSV_DATA, csvSchemaAdapter.getTargetSchema())
           .build();
     }
@@ -90,19 +97,24 @@ public class CsvRawdataConverter implements RawdataConverter {
     @Override
     public ConversionResult convert(RawdataMessage rawdataMessage) {
         ConversionResultBuilder resultBuilder = ConversionResult.builder(targetAvroSchema(), rawdataMessage);
-        addDcManifest(rawdataMessage, resultBuilder);
+        addManifest(rawdataMessage, resultBuilder);
         convertCsvData(rawdataMessage, csvSchemaAdapter, resultBuilder);
         return resultBuilder.build();
     }
 
-    void addDcManifest(RawdataMessage rawdataMessage, ConversionResultBuilder resultBuilder) {
-        resultBuilder.withRecord(FIELDNAME_DC_MANIFEST, dcMetadataSchemaAdapter().newRecord(rawdataMessage));
+    void addManifest(RawdataMessage rawdataMessage, ConversionResultBuilder resultBuilder) {
+        GenericRecord manifest = new GenericRecordBuilder(manifestSchema)
+          .set(FIELDNAME_DC_MANIFEST, dcManifestSchemaAdapter.newRecord(rawdataMessage, valueInterceptorChain))
+          .build();
+
+        resultBuilder.withRecord(FIELDNAME_MANIFEST, manifest);
     }
 
     void convertCsvData(RawdataMessage rawdataMessage, CsvSchemaAdapter csvSchema, ConversionResultBuilder resultBuilder) {
         byte[] data = rawdataMessage.get(RAWDATA_ITEMNAME_ENTRY);
         CsvParserSettings csvParserSettings = new CsvParserSettings().configure(converterConfig.getCsvSettings());
         csvParserSettings.headers(csvSchema.getHeaders());
+
 
         try (CsvToRecords records = new CsvToRecords(new ByteArrayInputStream(data), csvSchema.getItemSchema(), csvParserSettings)
           .withValueInterceptor(valueInterceptorChain::intercept)) {
