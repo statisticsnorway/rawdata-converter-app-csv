@@ -14,9 +14,11 @@ import org.apache.avro.generic.GenericRecordBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static no.ssb.rawdata.converter.app.csv.schema.CsvSchemaAdapter.RecordType.COLLECTION;
@@ -163,11 +165,17 @@ public class CsvSchemaAdapter {
     }
 
     public enum RecordType {
-        COLLECTION, SINGLE;
+        COLLECTION, SINGLE("entry");
+
+        RecordType(String... aliases) {
+            this.aliases.addAll(Arrays.asList(aliases));
+        }
+
+        private Set<String> aliases = new HashSet<>();
 
         public static Optional<RecordType> from(String s) {
             return Arrays.stream(RecordType.values())
-              .filter(t -> t.name().equalsIgnoreCase(s))
+              .filter(t -> t.name().equalsIgnoreCase(s) || t.aliases.contains(s))
               .findFirst();
         }
     }
