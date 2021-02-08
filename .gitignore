@@ -14,3 +14,4 @@ out/
 .classpath
 .factorypath
 application-local-private.yml
+/src/test/resources/rawdata-messages/private
